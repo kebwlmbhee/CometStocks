@@ -3,6 +3,7 @@ package com.comet.twstockinsight
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,32 +19,58 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
+import com.comet.twstockinsight.data.model.StockAverage
+import com.comet.twstockinsight.data.model.StockBwi
+import com.comet.twstockinsight.data.model.StockDetail
 import com.comet.twstockinsight.ui.theme.TWStockInsightTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val mViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TWStockInsightTheme {
+                // load data when first time
+                LaunchedEffect(Unit) {
+                    val stockDetailList = mViewModel.fetchStockDetail()
+                    val stockAverageList = mViewModel.fetchStockAverage()
+                    val bwiList = mViewModel.fetchStockBwi()
+                }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     StockInfoList(
-                        name = "Android",
+                        stockDetailList = null,
+                        stockAverageList = null,
+                        stockBwiList = null,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
+        lifecycleScope.launch {
+            val stockDetailList: List<StockDetail> = mViewModel.fetchStockDetail()
+            val stockAverageList: List<StockAverage> = mViewModel.fetchStockAverage()
+            val bwiList: List<StockBwi> = mViewModel.fetchStockBwi()
+        }
     }
 }
 
 @Composable
-fun StockInfoList(name: String, modifier: Modifier = Modifier) {
+fun StockInfoList(stockDetailList: List<StockDetail>?,
+                  stockAverageList: List<StockAverage>?,
+                  stockBwiList: List<StockBwi>?,
+                  modifier: Modifier = Modifier) {
     val items = (1..20).toList()
     LazyColumn(
         modifier = Modifier
@@ -53,13 +80,18 @@ fun StockInfoList(name: String, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(items) { item ->
-            StockCard(item)
+            StockCard(
+                stockDetailList?.get(item),
+                stockAverageList?.get(item),
+                stockBwiList?.get(item))
         }
     }
 }
 
 @Composable
-fun StockCard(item: Int) {
+fun StockCard(stockDetail: StockDetail?,
+              stockAverage: StockAverage?,
+              stockBwi: StockBwi?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,14 +99,16 @@ fun StockCard(item: Int) {
         // shadow
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        StockTitle(item)
-        StockPriceGrid(item)
-        StockTransaction(item)
+        StockTitle(stockDetail)
+        StockPriceGrid(stockDetail, stockAverage)
+        StockTransaction(stockDetail, stockBwi)
     }
 }
 
 @Composable
-fun StockTransaction(item: Int, modifier: Modifier = Modifier) {
+fun StockTransaction(stockDetail: StockDetail?,
+                     stockBwi: StockBwi?,
+                     modifier: Modifier = Modifier) {
     val transaction = listOf(
         "成交筆數" to "100",
         "成交股價" to "200",
@@ -86,7 +120,8 @@ fun StockTransaction(item: Int, modifier: Modifier = Modifier) {
             Text(
                 text = "${transaction[column].first}: ${transaction[column].second}",
                 fontSize = 12.sp,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier
+                    .padding(8.dp)
                     .weight(1f)
             )
         }
@@ -94,14 +129,16 @@ fun StockTransaction(item: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StockPriceGrid(item: Int, modifier: Modifier = Modifier) {
+fun StockPriceGrid(stockDetail: StockDetail?,
+                   stockAverage: StockAverage?,
+                   modifier: Modifier = Modifier) {
     val details = listOf(
-        "開盤" to "623.0",
-        "收盤" to "625.0",
-        "最高" to "630.0",
-        "最低" to "620.0",
-        "漲跌價" to "18.2",
-        "月平均" to "631",
+        "開盤價" to "623.0",
+        "收盤價" to "625.0",
+        "最高價" to "630.0",
+        "最低價" to "620.0",
+        "漲跌價差" to "18.2",
+        "月平均價" to "631",
     )
 
     Column(
@@ -127,17 +164,18 @@ fun StockPriceGrid(item: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun StockTitle(item: Int, modifier: Modifier = Modifier) {
+private fun StockTitle(stockDetail: StockDetail?,
+                       modifier: Modifier = Modifier) {
     Column {
         Text(
-            text = "Code $item",
+            text = stockDetail?.code ?: "--",
             fontSize = 12.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 8.dp, top = 8.dp)
         )
         Text(
-            text = "Name $item",
+            text = stockDetail?.name ?: "----",
             fontSize = 20.sp,
             modifier = Modifier
                 .padding(8.dp)
@@ -149,6 +187,6 @@ private fun StockTitle(item: Int, modifier: Modifier = Modifier) {
 @Composable
 fun StockInfoListPreview() {
     TWStockInsightTheme {
-        StockInfoList("Android")
+        StockInfoList(null, null, null)
     }
 }
