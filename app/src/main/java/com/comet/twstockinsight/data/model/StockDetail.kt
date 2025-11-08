@@ -1,16 +1,16 @@
 package com.comet.twstockinsight.data.model
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 
 // exchangeReport/STOCK_DAY_ALL
 data class StockDetail(
-    @SerialName("Code") val code: String,
-    @SerialName("Name") val name: String,
-    @SerialName("TradeVolume") val tradeVolume: String,
-    @SerialName("TradeValue") val tradeValue: String,
-    @SerialName("OpeningPrice") val openingPrice: String,
-    @SerialName("HighestPrice") val highestPrice: String,
-    @SerialName("LowestPrice") val lowestPrice: String,
-    @SerialName("ClosingPrice") val closingPrice: String,
-    @SerialName("Change") val change: String,
-    @SerialName("Transaction") val transaction: String)
+    @SerializedName("Code") val code: String,
+    @SerializedName("Name") val name: String,
+    @SerializedName("TradeVolume") val tradeVolume: String,
+    @SerializedName("TradeValue") val tradeValue: String,
+    @SerializedName("OpeningPrice") val openingPrice: String,
+    @SerializedName("HighestPrice") val highestPrice: String,
+    @SerializedName("LowestPrice") val lowestPrice: String,
+    @SerializedName("ClosingPrice") val closingPrice: String,
+    @SerializedName("Change") val change: String,
+    @SerializedName("Transaction") val transaction: String)

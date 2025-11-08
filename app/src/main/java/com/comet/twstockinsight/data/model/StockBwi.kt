@@ -1,12 +1,12 @@
 package com.comet.twstockinsight.data.model
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 
 // exchangeReport/BWIBBU_ALL
 data class StockBwi(
-    @SerialName("Code") val code: String,
-    @SerialName("Name") val name: String,
-    @SerialName("PEratio") val peRatio: String,
-    @SerialName("DividendYield") val dividendYield: String,
-    @SerialName("PBratio") val pbRatio: String) {
+    @SerializedName("Code") val code: String,
+    @SerializedName("Name") val name: String,
+    @SerializedName("PEratio") val peRatio: String,
+    @SerializedName("DividendYield") val dividendYield: String,
+    @SerializedName("PBratio") val pbRatio: String) {
 }

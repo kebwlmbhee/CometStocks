@@ -1,11 +1,11 @@
 package com.comet.twstockinsight.data.model
 
-import kotlinx.serialization.SerialName
+import com.google.gson.annotations.SerializedName
 
 
 // exchangeReport/STOCK_DAY_AVG_ALL
 data class StockAverage(
-    @SerialName("Code") val code: String,
-    @SerialName("Name") val name: String,
-    @SerialName("ClosingPrice") val closingPrice: String,
-    @SerialName("MonthlyAveragePrice") val monthlyAveragePrice: String)
+    @SerializedName("Code") val code: String,
+    @SerializedName("Name") val name: String,
+    @SerializedName("ClosingPrice") val closingPrice: String,
+    @SerializedName("MonthlyAveragePrice") val monthlyAveragePrice: String)
