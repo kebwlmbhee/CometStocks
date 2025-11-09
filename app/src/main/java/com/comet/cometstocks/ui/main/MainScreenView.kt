@@ -76,7 +76,7 @@ class MainScreenView {
             // https://developer.android.com/develop/ui/compose/components/app-bars?hl=zh-tw#center
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("") },
+                    title = { Text(stringResource(R.string.app_name)) },
                     actions = {
                         IconButton(onClick = { expanded = true }) {
                             Icon(
