@@ -15,6 +15,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -100,16 +101,16 @@ class MainScreenView {
         if (expanded) {
             ModalBottomSheet(
                 onDismissRequest = { expanded = false },
-                sheetState = sheetState
+                sheetState = sheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    TextButton(colors = ButtonDefaults.textButtonColors(
-                        containerColor = Color.Unspecified,
-                        contentColor = Color.Unspecified),
+                    TextButton(colors = ButtonDefaults.textButtonColors(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
@@ -128,9 +129,7 @@ class MainScreenView {
                             }
                         }
                     }
-                    TextButton(colors = ButtonDefaults.textButtonColors(
-                        containerColor = Color.Unspecified,
-                        contentColor = Color.Unspecified),
+                    TextButton(colors = ButtonDefaults.textButtonColors(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
