@@ -60,9 +60,9 @@ class StockCardView {
     fun StockTransaction(stockDetail: StockDetail?,
                          modifier: Modifier = Modifier) {
         val transaction = listOf(
-            stringResource(R.string.transaction) to (stockDetail?.transaction ?: NO_DATA),
-            stringResource(R.string.trade_volume) to (stockDetail?.tradeVolume ?: NO_DATA),
-            stringResource(R.string.trade_value) to (stockDetail?.tradeValue ?: NO_DATA)
+            stringResource(R.string.transaction) to (stockDetail?.transaction.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.trade_volume) to (stockDetail?.tradeVolume.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.trade_value) to (stockDetail?.tradeValue.takeIf { !it.isNullOrBlank() } ?: NO_DATA)
         )
 
         Row(Modifier.padding(horizontal = 16.dp)) {
@@ -83,12 +83,18 @@ class StockCardView {
                        stockAverage: StockAverage?,
                        modifier: Modifier = Modifier) {
         val details = listOf(
-            stringResource(R.string.opening_price) to (stockDetail?.openingPrice ?: NO_DATA),
-            stringResource(R.string.closeing_price) to (stockDetail?.closingPrice ?: NO_DATA),
-            stringResource(R.string.highest_price) to (stockDetail?.highestPrice ?: NO_DATA),
-            stringResource(R.string.lowest_price) to (stockDetail?.lowestPrice ?: NO_DATA),
-            stringResource(R.string.price_change) to (stockDetail?.change ?: NO_DATA),
-            stringResource(R.string.monthly_average_price) to (stockAverage?.monthlyAveragePrice ?: NO_DATA),
+            stringResource(R.string.opening_price) to
+                    (stockDetail?.openingPrice.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.closeing_price) to
+                    (stockDetail?.closingPrice.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.highest_price) to
+                    (stockDetail?.highestPrice.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.lowest_price) to
+                    (stockDetail?.lowestPrice.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.price_change) to
+                    (stockDetail?.change.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
+            stringResource(R.string.monthly_average_price) to
+                    (stockAverage?.monthlyAveragePrice.takeIf { !it.isNullOrBlank() } ?: NO_DATA),
         )
 
         Column(
@@ -134,6 +140,7 @@ class StockCardView {
         val closingPriceDouble = stockDetail?.closingPrice?.toDoubleOrNull() ?: 0.0
         val monthlyAveragePriceDouble = stockAverage?.monthlyAveragePrice?.toDoubleOrNull() ?: 0.0
         val closePriceColor = when {
+            stockDetail?.closingPrice.isNullOrBlank() || stockAverage?.monthlyAveragePrice.isNullOrBlank() -> Color.Unspecified
             closingPriceDouble > monthlyAveragePriceDouble -> Red
             closingPriceDouble < monthlyAveragePriceDouble -> Green
             else -> Color.Unspecified
@@ -153,14 +160,14 @@ class StockCardView {
                            modifier: Modifier = Modifier) {
         Column {
             Text(
-                text = stockDetail?.code ?: NO_DATA,
+                text = stockDetail?.code.takeIf { !it.isNullOrBlank() } ?: NO_DATA,
                 fontSize = 12.sp,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 8.dp, top = 8.dp)
             )
             Text(
-                text = stockDetail?.name ?: NO_NAME,
+                text = stockDetail?.name.takeIf { !it.isNullOrBlank() } ?: NO_NAME,
                 fontSize = 20.sp,
                 modifier = Modifier
                     .padding(8.dp)

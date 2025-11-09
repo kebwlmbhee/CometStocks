@@ -73,7 +73,7 @@ class StockInfoListView {
                     }
                 },
                 title = { Text(
-                    text = selectedName.value ?: NO_DATA
+                    text = selectedName.value.takeIf { !it.isNullOrBlank() } ?: NO_DATA
                 ) },
                 text = {
                     Text(
