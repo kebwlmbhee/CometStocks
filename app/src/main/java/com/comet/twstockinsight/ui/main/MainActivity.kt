@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.comet.twstockinsight.ui.main
 
 import android.os.Bundle
@@ -17,20 +19,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,9 +59,9 @@ import com.comet.twstockinsight.data.model.StockAverage
 import com.comet.twstockinsight.data.model.StockBwi
 import com.comet.twstockinsight.data.model.StockColorResult
 import com.comet.twstockinsight.data.model.StockDetail
-import com.comet.twstockinsight.ui.theme.TWStockInsightTheme
 import com.comet.twstockinsight.ui.theme.Green
 import com.comet.twstockinsight.ui.theme.Red
+import com.comet.twstockinsight.ui.theme.TWStockInsightTheme
 import com.comet.twstockinsight.util.Constants
 
 class MainActivity : ComponentActivity() {
@@ -74,6 +90,10 @@ fun MainScreen(mMainViewModel: MainViewModel) {
     val stockAverageList = mMainViewModel.stockAverageList.collectAsState()
     val stockBwiList = mMainViewModel.stockBwiList.collectAsState()
 
+    var expanded by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
     // load data only first time
     LaunchedEffect(lifecycleOwner) {
         // only update UI when activity is in started state
@@ -82,13 +102,73 @@ fun MainScreen(mMainViewModel: MainViewModel) {
         }
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(modifier = Modifier
+        .nestedScroll(scrollBehavior.nestedScrollConnection)
+        .fillMaxSize(),
+        // https://developer.android.com/develop/ui/compose/components/app-bars?hl=zh-tw#center
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("") },
+                actions = {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            Icons.Default.Menu,
+                            contentDescription = "Sort"
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }
+    ) { innerPadding ->
         StockInfoList(
             stockDetailList.value,
             stockAverageList.value,
             stockBwiList.value,
             modifier = Modifier.padding(innerPadding)
         )
+    }
+
+    if (expanded) {
+        ModalBottomSheet(
+            onDismissRequest = { expanded = false },
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                TextButton(colors = ButtonDefaults.textButtonColors(
+                    containerColor = Color.Unspecified,
+                    contentColor = Color.Unspecified),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    onClick = { mMainViewModel.sortStockListByCode(SortOrder.DESC) }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(stringResource(R.string.sort_desc_by_stock_code))
+                    }
+                }
+                TextButton(colors = ButtonDefaults.textButtonColors(
+                    containerColor = Color.Unspecified,
+                    contentColor = Color.Unspecified),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    onClick = { mMainViewModel.sortStockListByCode(SortOrder.ASC) }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(stringResource(R.string.sort_asc_by_stock_code))
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -116,6 +196,7 @@ fun StockInfoList(stockDetailList: List<StockDetail>?,
                 stockDetailList?.get(item),
                 stockAverageList?.get(item),
                 onClickBwi = { stockCode, stockName ->
+                    // find first matched stock or null
                     val matchedBwi = stockBwiList?.firstOrNull {
                         it.code == stockCode
                     }
@@ -306,7 +387,8 @@ private fun StockTitle(stockDetail: StockDetail?,
 @Preview(showBackground = true)
 @Composable
 fun StockInfoListPreview() {
+    val mainViewModel = MainViewModel().setFakeData()
     TWStockInsightTheme {
-        StockInfoList(null, null, null)
+        MainScreen(mMainViewModel = mainViewModel)
     }
 }

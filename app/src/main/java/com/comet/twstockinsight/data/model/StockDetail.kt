@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 // exchangeReport/STOCK_DAY_ALL
 data class StockDetail(
-    @SerializedName("Code") val code: String,
+    @SerializedName("Code") override val code: String,
     @SerializedName("Name") val name: String,
     @SerializedName("TradeVolume") val tradeVolume: String,
     @SerializedName("TradeValue") val tradeValue: String,
@@ -13,4 +13,5 @@ data class StockDetail(
     @SerializedName("LowestPrice") val lowestPrice: String,
     @SerializedName("ClosingPrice") val closingPrice: String,
     @SerializedName("Change") val change: String,
-    @SerializedName("Transaction") val transaction: String)
+    @SerializedName("Transaction") val transaction: String
+) : StockWithCode
