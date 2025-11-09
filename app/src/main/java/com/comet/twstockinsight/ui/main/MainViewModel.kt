@@ -20,7 +20,8 @@ class MainViewModel : ViewModel() {
         private val TAG = MainViewModel::class.qualifiedName
     }
 
-    private var mCurrentSortOrder = SortOrder.ORIGINAL
+    private val _currentSortOrder = MutableStateFlow(SortOrder.ORIGINAL)
+    val currentSortOrder = _currentSortOrder.asStateFlow()
     private val stockRepo = StockRepository()
     private val _stockDetailList = MutableStateFlow<List<StockDetail>?>(null)
     val stockDetailList = _stockDetailList.asStateFlow()
@@ -112,10 +113,10 @@ class MainViewModel : ViewModel() {
     }
 
     fun sortStockListByCode(sortOrder: SortOrder) {
-        if (mCurrentSortOrder == sortOrder) {
-            mCurrentSortOrder = SortOrder.ORIGINAL
+        _currentSortOrder.value = if (currentSortOrder.value == sortOrder) {
+            SortOrder.ORIGINAL
         } else {
-            mCurrentSortOrder = sortOrder
+            sortOrder
         }
         viewModelScope.launch {
             fetchOnce()
@@ -124,7 +125,7 @@ class MainViewModel : ViewModel() {
 
     private fun <T: StockWithCode> sortList(list: List<T>?): List<T>? {
         if (list == null) return null
-        return when (mCurrentSortOrder) {
+        return when (currentSortOrder.value) {
             SortOrder.ORIGINAL -> list
             SortOrder.ASC -> list.sortedBy { it.code }
             SortOrder.DESC -> list.sortedByDescending { it.code }

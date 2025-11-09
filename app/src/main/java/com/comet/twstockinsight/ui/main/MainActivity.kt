@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -47,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -93,6 +96,8 @@ fun MainScreen(mMainViewModel: MainViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    val currentSortOrder by mMainViewModel.currentSortOrder.collectAsState()
 
     // load data only first time
     LaunchedEffect(lifecycleOwner) {
@@ -151,6 +156,13 @@ fun MainScreen(mMainViewModel: MainViewModel) {
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(stringResource(R.string.sort_desc_by_stock_code))
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (currentSortOrder == SortOrder.DESC) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_check),
+                                contentDescription = "Selected"
+                            )
+                        }
                     }
                 }
                 TextButton(colors = ButtonDefaults.textButtonColors(
@@ -165,6 +177,13 @@ fun MainScreen(mMainViewModel: MainViewModel) {
                         horizontalArrangement = Arrangement.Start
                     ) {
                         Text(stringResource(R.string.sort_asc_by_stock_code))
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (currentSortOrder == SortOrder.ASC) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_check),
+                                contentDescription = "Selected",
+                            )
+                        }
                     }
                 }
             }
