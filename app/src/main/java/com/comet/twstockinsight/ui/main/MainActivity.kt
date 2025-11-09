@@ -82,31 +82,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TWStockInsightTheme {
-                MainScreen(mMainViewModel = mMainViewModel)
+                MainScreen(stockViewModel = mMainViewModel)
             }
         }
     }
 }
 
 @Composable
-fun MainScreen(mMainViewModel: MainViewModel) {
+fun MainScreen(stockViewModel: StockViewModel) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val stockDetailList = mMainViewModel.stockDetailList.collectAsState()
-    val stockAverageList = mMainViewModel.stockAverageList.collectAsState()
-    val stockBwiList = mMainViewModel.stockBwiList.collectAsState()
+    val stockDetailList = stockViewModel.stockDetailList.collectAsState()
+    val stockAverageList = stockViewModel.stockAverageList.collectAsState()
+    val stockBwiList = stockViewModel.stockBwiList.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val currentSortOrder by mMainViewModel.currentSortOrder.collectAsState()
+    val currentSortOrder by stockViewModel.currentSortOrder.collectAsState()
 
     // load data only first time
     LaunchedEffect(lifecycleOwner) {
         // only update UI when activity is in started state
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            mMainViewModel.fetchAllConcurrently()
+            stockViewModel.loadSortOrder()
+            stockViewModel.fetchAllConcurrently()
         }
     }
 
@@ -153,7 +154,7 @@ fun MainScreen(mMainViewModel: MainViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    onClick = { mMainViewModel.sortStockListByCode(SortOrder.DESC) }) {
+                    onClick = { stockViewModel.sortStockListByCode(SortOrder.DESC) }) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
@@ -174,7 +175,7 @@ fun MainScreen(mMainViewModel: MainViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    onClick = { mMainViewModel.sortStockListByCode(SortOrder.ASC) }) {
+                    onClick = { stockViewModel.sortStockListByCode(SortOrder.ASC) }) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Start
@@ -409,8 +410,7 @@ private fun StockTitle(stockDetail: StockDetail?,
 @Preview(showBackground = true)
 @Composable
 fun StockInfoListPreview() {
-    val mainViewModel = MainViewModel().setFakeData()
     TWStockInsightTheme {
-        MainScreen(mMainViewModel = mainViewModel)
+        MainScreen(FakeMainViewModel())
     }
 }
